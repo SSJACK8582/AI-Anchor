@@ -1,0 +1,5 @@
+pygame
+edge-tts
+requests
+python-dotenv
+bilibili-api-python
