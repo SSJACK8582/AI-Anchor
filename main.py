@@ -26,8 +26,8 @@ async def on_danmaku(event):
         name = info_list[2][1]
         danmaku = info_list[1]
         print('[弹幕]{}-{}'.format(name, danmaku))
-        if danmaku.startswith('Q:'):
-            danmaku = danmaku[2:].strip()
+        if danmaku.startswith('Q'):
+            danmaku = danmaku[1:].strip()
         if not danmaku_queue.full() and len(danmaku) > 0:
             await danmaku_queue.put(danmaku)
 
@@ -35,8 +35,21 @@ async def on_danmaku(event):
 @room.on('SEND_GIFT')
 async def on_gift(event):
     data = event.get('data', {}).get('data', {})
-    if data:
-        print('[礼物]{}-{}-{}'.format(data.get('uname'), data.get('action'), data.get('giftName')))
+    name = data.get('uname')
+    action = data.get('action')
+    gift = data.get('giftName')
+    print('[礼物]{}-{}-{}'.format(name, action, gift))
+    text = await get_chatgpt('观众{}赠送礼物{}'.format(name, gift), ts)
+    sound = await get_sound(text)
+    await play_sound(sound)
+
+
+@room.on('INTERACT_WORD')
+async def on_word(event):
+    name = event.get('data', {}).get('data', {}).get('uname')
+    print('[进入直播间]{}'.format(name))
+    sound = await get_sound('欢迎{}进入直播间'.format(name))
+    await play_sound(sound)
 
 
 async def get_sound(text):
